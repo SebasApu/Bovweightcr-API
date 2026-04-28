@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('reportes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('usuario_id')->constrained('usuarios');
+            $table->foreignId('usuario_id')->constrained('users');
             $table->dateTime('fecha_generacion');
             $table->enum('formato', ['pdf', 'excel']);
             $table->timestamps();
