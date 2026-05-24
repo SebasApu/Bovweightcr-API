@@ -18,13 +18,21 @@ class EloquentFincaRepository implements IFincaRepository
 
     public function findAll(): Collection
     {
-        return Finca::with('usuario')->latest()->get();
+        return Finca::with(['usuario', 'veterinario'])->latest()->get();
     }
 
     public function findByUsuarioId(int $usuarioId): Collection
     {
-        return Finca::with('usuario')
+        return Finca::with(['usuario', 'veterinario'])
             ->where('usuario_id', $usuarioId)
+            ->latest()
+            ->get();
+    }
+
+    public function findByVeterinarioId(int $veterinarioId): Collection
+    {
+        return Finca::with(['usuario', 'veterinario'])
+            ->where('veterinario_id', $veterinarioId)
             ->latest()
             ->get();
     }

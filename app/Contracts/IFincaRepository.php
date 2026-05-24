@@ -16,6 +16,8 @@ interface IFincaRepository
 
     public function findByUsuarioId(int $usuarioId): Collection;
 
+    public function findByVeterinarioId(int $veterinarioId): Collection;
+
     public function existsByNumeroFinca(string $numeroFinca, ?int $excludeId = null): bool;
 
     public function save(Finca $finca): Finca;

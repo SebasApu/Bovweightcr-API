@@ -23,8 +23,14 @@ class FincaService
 
     public function listar(User $user): Collection
     {
-        if ($user->tipo_id == 1) {
+        $user->loadMissing('tipoUsuario');
+
+        if ($user->esAdministrador()) {
             return $this->fincas->findAll();
+        }
+
+        if ($user->tipoUsuario?->nombre === 'Veterinario') {
+            return $this->fincas->findByVeterinarioId($user->id);
         }
 
         return $this->fincas->findByUsuarioId($user->id);
