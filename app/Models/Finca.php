@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+//Cambio
 class Finca extends Model
 {
     protected $fillable = ['usuario_id', 'veterinario_id', 'nombre', 'ubicacion', 'area', 'numero_finca'];
