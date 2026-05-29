@@ -28,7 +28,7 @@ class EloquentUserRepository implements IUserRepository
     {
         return User::with('tipoUsuario')
             ->when($search, fn ($q) => $q->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
+                $q->where('nombre', 'like', "%{$search}%")
                     ->orWhere('correo', 'like', "%{$search}%");
             }))
             ->get();
