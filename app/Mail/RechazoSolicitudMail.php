@@ -13,6 +13,7 @@ use Illuminate\Queue\SerializesModels;
  * Correo enviado al solicitante cuando el administrador rechaza su solicitud,
  * incluyendo el motivo del rechazo para que pueda subsanarlo.
  */
+// Un cambio
 class RechazoSolicitudMail extends Mailable
 {
     use Queueable, SerializesModels;
