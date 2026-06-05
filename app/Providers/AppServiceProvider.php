@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Contracts\IEstimacionPesoRepository;
 use App\Contracts\ISolicitudRegistroRepository;
 use App\Contracts\IFincaFactory;
 use App\Contracts\IFincaRepository;
@@ -18,6 +19,7 @@ use App\Factories\GanadoFactory;
 use App\Listeners\NotificarAprobacionSolicitud;
 use App\Listeners\NotificarBienvenidaUsuario;
 use App\Listeners\NotificarRechazoSolicitud;
+use App\Repositories\EloquentEstimacionPesoRepository;
 use App\Repositories\EloquentFincaRepository;
 use App\Repositories\EloquentGanadoRepository;
 use App\Repositories\EloquentSolicitudRegistroRepository;
@@ -41,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Repository bindings
+        $this->app->bind(IEstimacionPesoRepository::class, EloquentEstimacionPesoRepository::class);
         $this->app->bind(IUserRepository::class, EloquentUserRepository::class);
         $this->app->bind(ISolicitudRegistroRepository::class, EloquentSolicitudRegistroRepository::class);
         $this->app->bind(IFincaRepository::class, EloquentFincaRepository::class);
