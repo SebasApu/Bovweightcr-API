@@ -44,6 +44,7 @@ class GanadoController extends Controller
             'nombre'              => 'nullable|string|max:255',
             'sexo'                => 'nullable|in:Macho,Hembra',
             'raza'                => 'required|string|max:255',
+            'imagen'              => 'nullable|string',
         ]);
 
         try {
@@ -70,6 +71,7 @@ class GanadoController extends Controller
             'nombre'              => 'nullable|string|max:255',
             'sexo'                => 'nullable|in:Macho,Hembra',
             'raza'                => 'sometimes|string|max:255',
+            'imagen'              => 'nullable|string',
         ]);
 
         try {
@@ -94,6 +96,30 @@ class GanadoController extends Controller
             return response()->json(
                 $this->ganadoService->obtener((int) $id)
             );
+        } catch (NotFoundHttpException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
+    }
+
+    public function registrarPeso(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'peso' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            $registro = $this->ganadoService->registrarPeso(
+                (int) $id,
+                (float) $validated['peso'],
+                auth()->user(),
+            );
+
+            return response()->json([
+                'message' => 'Peso registrado correctamente',
+                'data'    => $registro,
+            ], 201);
+        } catch (AccessDeniedHttpException $e) {
+            return response()->json(['message' => $e->getMessage()], 403);
         } catch (NotFoundHttpException $e) {
             return response()->json(['message' => $e->getMessage()], 404);
         }

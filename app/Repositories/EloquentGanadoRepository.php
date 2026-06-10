@@ -10,20 +10,28 @@ class EloquentGanadoRepository implements IGanadoRepository
 {
     public function findById(int $id): ?Ganado
     {
-        return Ganado::with(['estadoSalud', 'estadoComercial'])->find($id);
+        return Ganado::with(['estadoSalud', 'estadoComercial', 'ultimoPeso'])->find($id);
     }
 
     public function findAllByUsuario(int $usuarioId): Collection
     {
-        return Ganado::with(['estadoSalud', 'estadoComercial', 'finca'])
+        return Ganado::with(['estadoSalud', 'estadoComercial', 'finca', 'ultimoPeso'])
             ->whereHas('finca', fn ($q) => $q->where('usuario_id', $usuarioId))
+            ->latest()
+            ->get();
+    }
+
+    public function findAllByVeterinario(int $veterinarioId): Collection
+    {
+        return Ganado::with(['estadoSalud', 'estadoComercial', 'finca', 'ultimoPeso'])
+            ->whereHas('finca', fn ($q) => $q->where('veterinario_id', $veterinarioId))
             ->latest()
             ->get();
     }
 
     public function findByFincaId(int $fincaId): Collection
     {
-        return Ganado::with(['estadoSalud', 'estadoComercial', 'finca'])
+        return Ganado::with(['estadoSalud', 'estadoComercial', 'finca', 'ultimoPeso'])
             ->where('finca_id', $fincaId)
             ->latest()
             ->get();

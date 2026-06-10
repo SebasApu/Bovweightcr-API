@@ -11,6 +11,8 @@ interface IGanadoRepository
 
     public function findAllByUsuario(int $usuarioId): Collection;
 
+    public function findAllByVeterinario(int $veterinarioId): Collection;
+
     public function findByFincaId(int $fincaId): Collection;
 
     public function existsByArete(string $arete, ?int $excludeId = null): bool;
