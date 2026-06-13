@@ -8,6 +8,7 @@ use App\Contracts\IFincaFactory;
 use App\Contracts\IFincaRepository;
 use App\Contracts\IGanadoFactory;
 use App\Contracts\IGanadoRepository;
+use App\Contracts\IRegistroPesoRepository;
 use App\Contracts\IUserFactory;
 use App\Contracts\IUserRepository;
 use App\Events\SolicitudAprobada;
@@ -22,6 +23,7 @@ use App\Listeners\NotificarRechazoSolicitud;
 use App\Repositories\EloquentEstimacionPesoRepository;
 use App\Repositories\EloquentFincaRepository;
 use App\Repositories\EloquentGanadoRepository;
+use App\Repositories\EloquentRegistroPesoRepository;
 use App\Repositories\EloquentSolicitudRegistroRepository;
 use App\Repositories\EloquentUserRepository;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -48,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ISolicitudRegistroRepository::class, EloquentSolicitudRegistroRepository::class);
         $this->app->bind(IFincaRepository::class, EloquentFincaRepository::class);
         $this->app->bind(IGanadoRepository::class, EloquentGanadoRepository::class);
+        $this->app->bind(IRegistroPesoRepository::class, EloquentRegistroPesoRepository::class);
 
         // Factory binding (singleton: se crea una sola instancia)
         $this->app->singleton(IUserFactory::class, UserFactory::class);

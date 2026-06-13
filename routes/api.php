@@ -8,6 +8,7 @@ use App\Http\Middleware\EsAdministrador;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\EstimacionPesoController;
 use App\Http\Controllers\Api\GanadoController;
+use App\Http\Controllers\Api\RegistroPesoController;
 use App\Http\Controllers\Api\CatalogoController;
 
 /*
@@ -32,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('ganado/{id}', [GanadoController::class, 'update']);
     Route::delete('ganado/{id}', [GanadoController::class, 'destroy']);
     Route::post('ganado/{id}/peso', [GanadoController::class, 'registrarPeso']);
+    Route::get('ganado/{id}/historial', [RegistroPesoController::class, 'historial']);
 
     Route::get('catalogos/estados-salud', [CatalogoController::class, 'estadosSalud']);
     Route::get('catalogos/estados-comerciales', [CatalogoController::class, 'estadosComerciales']);
