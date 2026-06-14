@@ -16,7 +16,8 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'http://localhost:5173',   // Vite dev server (bovweight-web y bovweight-movil browser)
+        'http://localhost:5173',   // Vite dev server (bovweight-movil browser)
+        'http://localhost:5174',   // Vite dev server (bovweight-web admin)
         'http://localhost:8100',   // Ionic CLI dev server
         'http://localhost:3000',   // Vue dev server alternativo
         'capacitor://localhost',   // Capacitor runtime iOS

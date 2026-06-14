@@ -3,28 +3,34 @@
 namespace App\Providers;
 
 use App\Contracts\IEstimacionPesoRepository;
-use App\Contracts\ISolicitudRegistroRepository;
 use App\Contracts\IFincaFactory;
 use App\Contracts\IFincaRepository;
 use App\Contracts\IGanadoFactory;
 use App\Contracts\IGanadoRepository;
 use App\Contracts\IRegistroPesoRepository;
+use App\Contracts\ISolicitudRegistroRepository;
+use App\Contracts\ISolicitudVeterinarioRepository;
 use App\Contracts\IUserFactory;
 use App\Contracts\IUserRepository;
 use App\Events\SolicitudAprobada;
 use App\Events\SolicitudRechazada;
+use App\Events\SolicitudVeterinarioAprobada;
+use App\Events\SolicitudVeterinarioRechazada;
 use App\Events\UsuarioCreado;
-use App\Factories\UserFactory;
 use App\Factories\FincaFactory;
 use App\Factories\GanadoFactory;
+use App\Factories\UserFactory;
 use App\Listeners\NotificarAprobacionSolicitud;
+use App\Listeners\NotificarAprobacionSolicitudVeterinario;
 use App\Listeners\NotificarBienvenidaUsuario;
 use App\Listeners\NotificarRechazoSolicitud;
+use App\Listeners\NotificarRechazoSolicitudVeterinario;
 use App\Repositories\EloquentEstimacionPesoRepository;
 use App\Repositories\EloquentFincaRepository;
 use App\Repositories\EloquentGanadoRepository;
 use App\Repositories\EloquentRegistroPesoRepository;
 use App\Repositories\EloquentSolicitudRegistroRepository;
+use App\Repositories\EloquentSolicitudVeterinarioRepository;
 use App\Repositories\EloquentUserRepository;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Event;
@@ -52,6 +58,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(IGanadoRepository::class, EloquentGanadoRepository::class);
         $this->app->bind(IRegistroPesoRepository::class, EloquentRegistroPesoRepository::class);
 
+        $this->app->bind(ISolicitudVeterinarioRepository::class, EloquentSolicitudVeterinarioRepository::class);
+
         // Factory binding (singleton: se crea una sola instancia)
         $this->app->singleton(IUserFactory::class, UserFactory::class);
         $this->app->singleton(IFincaFactory::class, FincaFactory::class);
@@ -68,6 +76,8 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(SolicitudAprobada::class, NotificarAprobacionSolicitud::class);
         Event::listen(SolicitudRechazada::class, NotificarRechazoSolicitud::class);
         Event::listen(UsuarioCreado::class, NotificarBienvenidaUsuario::class);
+        Event::listen(SolicitudVeterinarioAprobada::class, NotificarAprobacionSolicitudVeterinario::class);
+        Event::listen(SolicitudVeterinarioRechazada::class, NotificarRechazoSolicitudVeterinario::class);
 
         // Como el proyecto es API-only no existe la ruta nombrada 'password.reset'.
         // La URL apunta al frontend configurado en FRONTEND_URL.
