@@ -1,15 +1,16 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CatalogoController;
+use App\Http\Controllers\Api\EstimacionPesoController;
 use App\Http\Controllers\Api\FincaController;
+use App\Http\Controllers\Api\GanadoController;
+use App\Http\Controllers\Api\RegistroPesoController;
 use App\Http\Controllers\Api\SolicitudRegistroController;
+use App\Http\Controllers\Api\SolicitudVeterinarioController;
 use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Middleware\EsAdministrador;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\EstimacionPesoController;
-use App\Http\Controllers\Api\GanadoController;
-use App\Http\Controllers\Api\RegistroPesoController;
-use App\Http\Controllers\Api\CatalogoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,10 +23,18 @@ use App\Http\Controllers\Api\CatalogoController;
 |
 */
 
-// Rutas de fincas y ganado (CRUD)
+// Rutas de fincas, ganado y solicitudes de veterinario
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('fincas', FincaController::class);
+
+    // Asignaciones (solo admin)
+    Route::middleware(EsAdministrador::class)->group(function () {
+        Route::put('fincas/{id}/ganadero', [FincaController::class, 'asignarGanadero']);
+        Route::delete('fincas/{id}/ganadero', [FincaController::class, 'removerGanadero']);
+        Route::put('fincas/{id}/veterinario', [FincaController::class, 'asignarVeterinario']);
+        Route::delete('fincas/{id}/veterinario', [FincaController::class, 'removerVeterinario']);
+    });
 
     Route::get('ganado', [GanadoController::class, 'index']);
     Route::post('ganado', [GanadoController::class, 'store']);
@@ -37,6 +46,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('catalogos/estados-salud', [CatalogoController::class, 'estadosSalud']);
     Route::get('catalogos/estados-comerciales', [CatalogoController::class, 'estadosComerciales']);
+    Route::get('catalogos/ganaderos', [CatalogoController::class, 'ganaderos']);
+    Route::get('catalogos/veterinarios', [CatalogoController::class, 'veterinarios']);
+
+    // Solicitudes de veterinario — creación (ganadero)
+    Route::post('solicitudes-veterinario', [SolicitudVeterinarioController::class, 'store']);
 
 });
 
@@ -70,5 +84,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/solicitudes/pendientes', [SolicitudRegistroController::class, 'pendientes'])->name('solicitudes.pendientes');
         Route::get('/solicitudes/{id}', [SolicitudRegistroController::class, 'show'])->name('solicitudes.show');
         Route::put('/solicitudes/{id}/revisar', [SolicitudRegistroController::class, 'revisar'])->name('solicitudes.revisar');
+
+        // Solicitudes de veterinario — gestión admin
+        Route::get('/solicitudes-veterinario', [SolicitudVeterinarioController::class, 'index']);
+        Route::get('/solicitudes-veterinario/pendientes', [SolicitudVeterinarioController::class, 'pendientes']);
+        Route::get('/solicitudes-veterinario/{id}', [SolicitudVeterinarioController::class, 'show']);
+        Route::put('/solicitudes-veterinario/{id}/revisar', [SolicitudVeterinarioController::class, 'revisar']);
     });
 });
