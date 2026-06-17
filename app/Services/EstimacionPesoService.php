@@ -22,7 +22,7 @@ class EstimacionPesoService
 
     public function estimar(int $ganadoId, UploadedFile $imagen, string $breed, float $distanceCm, float $cameraFov): array
     {
-        $path = $imagen->store('estimaciones', 'public');
+        $path = $imagen->store('estimaciones', 's3');
 
         try {
             $response = Http::timeout(60)
@@ -32,12 +32,12 @@ class EstimacionPesoService
                 ->attach('camera_fov', (string) $cameraFov)
                 ->post("{$this->mlServiceUrl}/api/estimate");
         } catch (\Exception $e) {
-            Storage::disk('public')->delete($path);
+            Storage::disk('s3')->delete($path);
             throw new ServiceUnavailableHttpException(message: 'No se pudo conectar con el servicio de estimacion.');
         }
 
         if (!$response->successful()) {
-            Storage::disk('public')->delete($path);
+            Storage::disk('s3')->delete($path);
             throw new HttpException($response->status(), 'Error en la estimacion.');
         }
 
@@ -89,7 +89,7 @@ class EstimacionPesoService
 
         $data = $response->json();
 
-        $path = $imagenes[0]->store('estimaciones', 'public');
+        $path = $imagenes[0]->store('estimaciones', 's3');
 
         $registro = new RegistroPeso([
             'ganado_id'       => $ganadoId,

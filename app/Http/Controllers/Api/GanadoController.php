@@ -165,15 +165,15 @@ class GanadoController extends Controller
         $base64 = preg_replace('/^data:image\/\w+;base64,/', '', $base64Uri);
         $decoded = base64_decode($base64);
         $filename = 'ganado_' . uniqid() . '.jpg';
-        Storage::disk('public')->put("ganado/{$filename}", $decoded);
+        Storage::disk('s3')->put("ganado/{$filename}", $decoded);
 
-        return url(Storage::url("ganado/{$filename}"));
+        return Storage::disk('s3')->url("ganado/{$filename}");
     }
 
     private function eliminarImagen(string $imagenUrl): void
     {
         $path = parse_url($imagenUrl, PHP_URL_PATH);
         $relativa = ltrim(str_replace('/storage', '', $path), '/');
-        Storage::disk('public')->delete($relativa);
+        Storage::disk('s3')->delete($relativa);
     }
 }
