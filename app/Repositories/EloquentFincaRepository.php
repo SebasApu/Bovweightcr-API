@@ -13,7 +13,7 @@ class EloquentFincaRepository implements IFincaRepository
 {
     public function findById(int $id): ?Finca
     {
-        return Finca::with(['usuario', 'ganados'])->find($id);
+        return Finca::with(['usuario', 'veterinario', 'ganados'])->find($id);
     }
 
     public function findAll(): Collection
@@ -48,7 +48,7 @@ class EloquentFincaRepository implements IFincaRepository
     {
         $finca->save();
 
-        return $finca->fresh(['usuario', 'ganados']);
+        return $finca->fresh(['usuario', 'veterinario', 'ganados']);
     }
 
     public function delete(int $id): void

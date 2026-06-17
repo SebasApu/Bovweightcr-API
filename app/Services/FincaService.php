@@ -4,12 +4,14 @@ namespace App\Services;
 
 use App\Contracts\IFincaFactory;
 use App\Contracts\IFincaRepository;
+use App\Contracts\IUserRepository;
 use App\Models\Finca;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * Lógica de negocio del CRUD de fincas.
@@ -19,6 +21,7 @@ class FincaService
     public function __construct(
         private readonly IFincaRepository $fincas,
         private readonly IFincaFactory $fincaFactory,
+        private readonly IUserRepository $usuarios,
     ) {}
 
     public function listar(User $user): Collection
@@ -80,5 +83,63 @@ class FincaService
         }
 
         $this->fincas->delete($id);
+    }
+
+    public function asignarGanadero(int $fincaId, int $usuarioId): Finca
+    {
+        $finca = $this->obtener($fincaId);
+
+        $usuario = $this->usuarios->findById($usuarioId);
+
+        if (! $usuario) {
+            throw new NotFoundHttpException('Usuario no encontrado.');
+        }
+
+        $usuario->loadMissing('tipoUsuario');
+
+        if ($usuario->tipoUsuario?->nombre !== 'Ganadero') {
+            throw new UnprocessableEntityHttpException('El usuario no tiene rol de Ganadero.');
+        }
+
+        $finca->usuario_id = $usuarioId;
+
+        return $this->fincas->save($finca);
+    }
+
+    public function removerGanadero(int $fincaId): Finca
+    {
+        $finca = $this->obtener($fincaId);
+        $finca->usuario_id = null;
+
+        return $this->fincas->save($finca);
+    }
+
+    public function asignarVeterinario(int $fincaId, int $usuarioId): Finca
+    {
+        $finca = $this->obtener($fincaId);
+
+        $usuario = $this->usuarios->findById($usuarioId);
+
+        if (! $usuario) {
+            throw new NotFoundHttpException('Usuario no encontrado.');
+        }
+
+        $usuario->loadMissing('tipoUsuario');
+
+        if ($usuario->tipoUsuario?->nombre !== 'Veterinario') {
+            throw new UnprocessableEntityHttpException('El usuario no tiene rol de Veterinario.');
+        }
+
+        $finca->veterinario_id = $usuarioId;
+
+        return $this->fincas->save($finca);
+    }
+
+    public function removerVeterinario(int $fincaId): Finca
+    {
+        $finca = $this->obtener($fincaId);
+        $finca->veterinario_id = null;
+
+        return $this->fincas->save($finca);
     }
 }
