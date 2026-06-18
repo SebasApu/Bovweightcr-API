@@ -138,6 +138,30 @@ class GanadoController extends Controller
         }
     }
 
+    public function actualizarEstadoSalud(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'estado_salud_id' => 'required|exists:estado_salud_ganados,id',
+        ]);
+
+        try {
+            $ganado = $this->ganadoService->actualizarEstadoSalud(
+                (int) $id,
+                (int) $validated['estado_salud_id'],
+                auth()->user(),
+            );
+
+            return response()->json([
+                'message' => 'Estado de salud actualizado correctamente',
+                'data'    => $ganado,
+            ]);
+        } catch (AccessDeniedHttpException $e) {
+            return response()->json(['message' => $e->getMessage()], 403);
+        } catch (NotFoundHttpException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
+    }
+
     public function destroy(string $id)
     {
         try {

@@ -103,6 +103,22 @@ class GanadoService
     }
 
     /**
+     * Actualiza el estado de salud del animal. Acceso exclusivo del
+     * veterinario asignado a la finca del animal (ni el dueño ni otro
+     * veterinario pueden usar esta operación).
+     */
+    public function actualizarEstadoSalud(int $id, int $estadoSaludId, User $user): Ganado
+    {
+        $ganado = $this->obtener($id);
+
+        $this->verificarVeterinarioAsignado($ganado->finca_id, $user);
+
+        $ganado->estado_salud_id = $estadoSaludId;
+
+        return $this->ganados->save($ganado);
+    }
+
+    /**
      * Acceso de LECTURA: permite al dueño de la finca o al veterinario asignado.
      */
     private function verificarAccesoFinca(int $fincaId, User $user): void
@@ -134,6 +150,28 @@ class GanadoService
 
         if ($finca->usuario_id !== $user->id) {
             throw new AccessDeniedHttpException('No tienes acceso a esta finca.');
+        }
+    }
+
+    /**
+     * Acceso de ESCRITURA exclusivo del veterinario asignado (solo para
+     * cambiar el estado de salud, no para el resto del animal).
+     */
+    private function verificarVeterinarioAsignado(int $fincaId, User $user): void
+    {
+        $user->loadMissing('tipoUsuario');
+
+        $finca = Finca::find($fincaId);
+
+        if (! $finca) {
+            throw new NotFoundHttpException('Finca no encontrada.');
+        }
+
+        $esVeterinario = $user->tipoUsuario?->nombre === 'Veterinario';
+        $esAsignado    = $finca->veterinario_id === $user->id;
+
+        if (! $esVeterinario || ! $esAsignado) {
+            throw new AccessDeniedHttpException('Solo el veterinario asignado a esta finca puede actualizar el estado de salud.');
         }
     }
 }
