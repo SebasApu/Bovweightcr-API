@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('ganado/{id}/peso', [GanadoController::class, 'registrarPeso']);
     Route::patch('ganado/{id}/estado-salud', [GanadoController::class, 'actualizarEstadoSalud']);
     Route::get('ganado/{id}/historial', [RegistroPesoController::class, 'historial']);
+    Route::get('pesajes/recientes', [RegistroPesoController::class, 'recientes']);
 
     Route::get('catalogos/estados-salud', [CatalogoController::class, 'estadosSalud']);
     Route::get('catalogos/estados-comerciales', [CatalogoController::class, 'estadosComerciales']);

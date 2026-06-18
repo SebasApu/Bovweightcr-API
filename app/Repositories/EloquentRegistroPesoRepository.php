@@ -15,4 +15,17 @@ class EloquentRegistroPesoRepository implements IRegistroPesoRepository
             ->orderBy('created_at', 'desc')
             ->get();
     }
+
+    public function findRecientesByGanadoIds(array $ganadoIds, int $limit): Collection
+    {
+        if (empty($ganadoIds)) {
+            return collect();
+        }
+
+        return RegistroPeso::with('ganado')
+            ->whereIn('ganado_id', $ganadoIds)
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
 }
