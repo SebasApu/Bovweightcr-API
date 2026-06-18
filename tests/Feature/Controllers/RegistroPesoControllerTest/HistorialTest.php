@@ -70,9 +70,11 @@ class HistorialTest extends TestCase
             ->getJson("/api/ganado/{$ganado->id}/historial");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2)
-            ->assertJsonPath('0.peso_estimado', 420)
-            ->assertJsonPath('1.peso_estimado', 400);
+            ->assertJsonCount(2);
+
+        $data = $response->json();
+        $this->assertEquals(420.0, (float) $data[0]['peso_estimado']);
+        $this->assertEquals(400.0, (float) $data[1]['peso_estimado']);
     }
 
     public function test_obtener_historial_de_ganado_inexistente_devuelve_404(): void
