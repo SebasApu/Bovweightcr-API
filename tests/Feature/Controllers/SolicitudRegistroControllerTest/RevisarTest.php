@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Controllers\SolicitudRegistroControllerTest;
 
 use App\Events\SolicitudAprobada;
 use App\Events\SolicitudRechazada;
@@ -13,7 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class SolicitudRegistroTest extends TestCase
+class RevisarTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -23,94 +23,6 @@ class SolicitudRegistroTest extends TestCase
         $this->seed(TipoUsuarioSeeder::class);
         $this->seed(EstadoSolicitudSeeder::class);
     }
-
-    private function datosSolicitud(array $override = []): array
-    {
-        return array_merge([
-            'nombre' => 'Carlos',
-            'apellidos' => 'Méndez Arias',
-            'correo' => 'carlos@ganadero.com',
-            'numero_celular' => '88001234',
-        ], $override);
-    }
-
-    // ── Enviar solicitud (HU-01.1 / RF-01) ───────────────────────────────────
-
-    public function test_usuario_externo_puede_enviar_solicitud(): void
-    {
-        $response = $this->postJson('/api/solicitudes', $this->datosSolicitud());
-
-        $response->assertStatus(201)
-            ->assertJsonPath('correo', 'carlos@ganadero.com')
-            ->assertJsonPath('estado', 'Pendiente');
-
-        $this->assertDatabaseHas('solicitud_registros', ['correo' => 'carlos@ganadero.com']);
-    }
-
-    public function test_solicitud_sin_nombre_devuelve_422(): void
-    {
-        $this->postJson('/api/solicitudes', $this->datosSolicitud(['nombre' => '']))
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['nombre']);
-    }
-
-    public function test_solicitud_con_correo_invalido_devuelve_422(): void
-    {
-        $this->postJson('/api/solicitudes', $this->datosSolicitud(['correo' => 'no-es-correo']))
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['correo']);
-    }
-
-    public function test_solicitud_duplicada_devuelve_409(): void
-    {
-        $this->postJson('/api/solicitudes', $this->datosSolicitud());
-        $this->postJson('/api/solicitudes', $this->datosSolicitud())
-            ->assertStatus(409);
-    }
-
-    public function test_solicitud_con_correo_ya_registrado_devuelve_409(): void
-    {
-        User::factory()->create(['correo' => 'carlos@ganadero.com']);
-
-        $this->postJson('/api/solicitudes', $this->datosSolicitud())
-            ->assertStatus(409);
-    }
-
-    // ── Listar solicitudes (admin) ────────────────────────────────────────────
-
-    public function test_admin_puede_listar_todas_las_solicitudes(): void
-    {
-        $admin = User::factory()->administrador()->create();
-        SolicitudRegistro::factory()->count(3)->create();
-
-        $this->actingAs($admin)
-            ->getJson('/api/solicitudes')
-            ->assertStatus(200)
-            ->assertJsonCount(3);
-    }
-
-    public function test_admin_puede_listar_solicitudes_pendientes(): void
-    {
-        $admin = User::factory()->administrador()->create();
-        SolicitudRegistro::factory()->count(2)->pendiente()->create();
-        SolicitudRegistro::factory()->aprobada()->create();
-
-        $this->actingAs($admin)
-            ->getJson('/api/solicitudes/pendientes')
-            ->assertStatus(200)
-            ->assertJsonCount(2);
-    }
-
-    public function test_ganadero_no_puede_listar_solicitudes(): void
-    {
-        $ganadero = User::factory()->ganadero()->create();
-
-        $this->actingAs($ganadero)
-            ->getJson('/api/solicitudes')
-            ->assertStatus(403);
-    }
-
-    // ── Revisar solicitud (HU-01.8 / RF-05) ──────────────────────────────────
 
     public function test_admin_puede_aprobar_solicitud_y_dispara_evento(): void
     {
