@@ -19,7 +19,7 @@ class EstimacionPesoController extends Controller
         $validated = $request->validate([
             'image'       => 'required|image|max:10240',
             'ganado_id'   => 'required|exists:ganados,id',
-            'breed'       => 'nullable|string|in:brahman,cebu,criollo,default',
+            'breed'       => 'nullable|string|in:brahman,cebu,criollo,holstein,jersey,angus,hereford,simmental,default',
             'distance_cm' => 'nullable|numeric',
             'camera_fov'  => 'nullable|numeric',
         ]);
@@ -47,7 +47,7 @@ class EstimacionPesoController extends Controller
             'images'      => 'required|array|min:2|max:5',
             'images.*'    => 'image|max:10240',
             'ganado_id'   => 'required|exists:ganados,id',
-            'breed'       => 'nullable|string|in:brahman,cebu,criollo,default',
+            'breed'       => 'nullable|string|in:brahman,cebu,criollo,holstein,jersey,angus,hereford,simmental,default',
             'distance_cm' => 'nullable|numeric',
             'camera_fov'  => 'nullable|numeric',
         ]);
