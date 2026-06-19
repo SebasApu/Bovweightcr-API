@@ -6,18 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
+use App\Services\OtpService;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
  * Maneja autenticación: login, logout, perfil y recuperación de contraseña.
- * Solo orquesta; la lógica vive en AuthService (SRP).
+ * Solo orquesta; la lógica vive en AuthService/OtpService (SRP).
  */
 class AuthController extends Controller
 {
     public function __construct(
         private readonly AuthService $authService,
+        private readonly OtpService $otpService,
     ) {}
 
     /**
@@ -100,5 +102,46 @@ class AuthController extends Controller
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
+    }
+
+    /**
+     * POST /api/auth/otp/send
+     * Genera y envía un código OTP de 6 dígitos (vence en 2 minutos).
+     * Mismo endpoint para "Olvidé mi contraseña" y "Cambiar contraseña".
+     */
+    public function sendOtp(Request $request): JsonResponse
+    {
+        $request->validate(['correo' => ['required', 'email']]);
+
+        try {
+            $this->otpService->enviar($request->correo);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 429);
+        }
+
+        return response()->json([
+            'message' => 'Si el correo está registrado, recibirás un código de verificación.',
+        ]);
+    }
+
+    /**
+     * POST /api/auth/otp/verify
+     * Valida el código OTP y devuelve un token de reseteo estándar de
+     * Laravel para usar de inmediato con /auth/reset-password.
+     */
+    public function verifyOtp(Request $request): JsonResponse
+    {
+        $request->validate([
+            'correo' => ['required', 'email'],
+            'codigo' => ['required', 'string', 'size:6'],
+        ]);
+
+        try {
+            $token = $this->otpService->verificar($request->correo, $request->codigo);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['token' => $token]);
     }
 }
