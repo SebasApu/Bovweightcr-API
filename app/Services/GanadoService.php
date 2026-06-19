@@ -24,6 +24,10 @@ class GanadoService
     {
         $user->loadMissing('tipoUsuario');
 
+        if ($user->esAdministrador()) {
+            return $this->ganados->findAll();
+        }
+
         if ($user->tipoUsuario?->nombre === 'Veterinario') {
             return $this->ganados->findAllByVeterinario($user->id);
         }
@@ -127,6 +131,12 @@ class GanadoService
 
         if (! $finca) {
             throw new NotFoundHttpException('Finca no encontrada.');
+        }
+
+        $user->loadMissing('tipoUsuario');
+
+        if ($user->esAdministrador()) {
+            return;
         }
 
         $esDueno         = $finca->usuario_id === $user->id;
