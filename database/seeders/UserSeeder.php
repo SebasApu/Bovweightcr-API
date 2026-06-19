@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
             [
                 'tipo_nombre' => 'Administrador',
                 'nombre' => 'Admin BovWeight',
-                'correo' => 'admin@bovweight.com',
+                'correo' => 'hassadnassar@gmail.com',
                 'contrasena' => 'password123',
             ],
             [
