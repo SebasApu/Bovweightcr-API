@@ -62,6 +62,12 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('reset-password');
+
+    // OTP de 6 dígitos (vence en 2 min): mismo flujo para "Olvidé mi contraseña"
+    // y "Cambiar contraseña". Throttle por IP como primera capa de defensa;
+    // OtpService aplica además el límite de intentos por correo (5 -> bloqueo 15 min).
+    Route::post('/otp/send', [AuthController::class, 'sendOtp'])->name('otp.send')->middleware('throttle:6,1');
+    Route::post('/otp/verify', [AuthController::class, 'verifyOtp'])->name('otp.verify')->middleware('throttle:10,1');
 });
 
 Route::post('/solicitudes', [SolicitudRegistroController::class, 'store'])->name('solicitudes.store');
