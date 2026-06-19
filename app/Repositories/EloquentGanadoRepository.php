@@ -13,6 +13,13 @@ class EloquentGanadoRepository implements IGanadoRepository
         return Ganado::with(['estadoSalud', 'estadoComercial', 'ultimoPeso'])->find($id);
     }
 
+    public function findAll(): Collection
+    {
+        return Ganado::with(['estadoSalud', 'estadoComercial', 'finca', 'ultimoPeso'])
+            ->latest()
+            ->get();
+    }
+
     public function findAllByUsuario(int $usuarioId): Collection
     {
         return Ganado::with(['estadoSalud', 'estadoComercial', 'finca', 'ultimoPeso'])

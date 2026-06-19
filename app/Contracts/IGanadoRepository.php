@@ -9,6 +9,8 @@ interface IGanadoRepository
 {
     public function findById(int $id): ?Ganado;
 
+    public function findAll(): Collection;
+
     public function findAllByUsuario(int $usuarioId): Collection;
 
     public function findAllByVeterinario(int $veterinarioId): Collection;
